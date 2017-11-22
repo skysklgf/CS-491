@@ -61,7 +61,7 @@ int main()
 	   {
 	      case 1 :
 	      	 	check_attrib_num(ID, Attrib_num); // Check how many attributes each ID has
-				FindSameAttrib(Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
+				//FindSameAttrib(Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
 
 				initial_row = ID_testing.back();
 				initial_col = FindHighestNum(Attrib_testing) + 1;
@@ -73,7 +73,7 @@ int main()
 	         break;
 	      case 2 :
 				check_attrib_num(ID_testing, Attrib_num_test); // Check how many attributes each ID has
-				FindSameAttrib(Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
+				//FindSameAttrib(Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
 
 
 				initial_row = ID_testing.back();
