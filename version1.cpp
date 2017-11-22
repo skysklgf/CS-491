@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<float>& id_test, vector<float>& attrib_test, vector<float>& attrib_val_test, vector<int>& Class_label);
+void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& Class_label);
 void setSizeMatrix(int row, int col, vector< vector<float> > &matrix);
 void setupMatrix_value(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& num, int row, int col, vector< vector<float> >&matrix);
 void check_attrib_num(vector<float>& id,vector<int>& num);
@@ -26,37 +26,21 @@ int main()
 	vector<int>class_label;
 	vector<float>Common_value = {0}; // ignore this one
 
-	vector<float> ID_testing;
-	vector<float> Attrib_testing;
-	vector<float> Attrib_val_testing;
-	vector<int>Attrib_num_test; // # of attribute per each ID
-	vector<int>Common_Attrib_test; // contain only common attribute
-
 	vector<vector<float> > Matrix; 
 
-	readFile(ID, Attrib, Attrib_val, ID_testing, Attrib_testing, Attrib_val_testing, class_label); // Read input files
+	readFile(ID, Attrib, Attrib_val, class_label); // Read input files
 	check_attrib_num(ID, Attrib_num); // Check how many attributes each ID has
 	FindSameAttrib(Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
 	setSizeMatrix(initial_row, initial_col, Matrix); // setup size of Matrix
 
 	setupMatrix_value(ID, Attrib, Attrib_val, Attrib_num, initial_row, initial_col, Matrix); // fill the values for the matrix
 
-	//WriteFile(initial_row,initial_col,Matrix, class_label); // export a output file 
-	cout << "hello" << endl;
-
-
-/***************************************************************************************************************************************/
-	//check_attrib_num(ID_testing, Attrib_num_test); // Check how many attributes each ID has
-	//FindSameAttrib(Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
-
-	//cout << Common_Attrib_test.size() << endl;
-	//initial_row = 
-	//setSizeMatrix(initial_row, initial_col, Matrix); // setup size of Matrix
+	WriteFile(initial_row,initial_col,Matrix, class_label); // export a output file 
 
 	return 0;
 }
 
-void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<float>& id_test, vector<float>& attrib_test, vector<float>& attrib_val_test, vector<int>& Class_label)
+void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& Class_label)
 {
 	fstream reader;
 	reader.open("training.txt", ios::in);
@@ -85,22 +69,6 @@ void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_va
 	{
 		getline(reader, temp, '\n');
 		Class_label.push_back(stoi(temp));
-	}
-	reader.close();
-
-	reader.open("testing.txt", ios::in);
-
-	while(reader)
-	{
-		getline(reader, temp, ' '); //get ID for testing
-		id_test.push_back(stof(temp));
-		//cout << temp << " ";
-		getline(reader, temp2, ' '); // get Attribute for testing
-		attrib_test.push_back(stof(temp2));
-		//cout << temp2 << " ";
-		getline(reader, temp3, '\n'); // get Feature value for testing
-		attrib_val_test.push_back(stof(temp3));
-		//cout << temp3 << endl;
 	}
 	reader.close();
 
@@ -183,21 +151,15 @@ void check_attrib_num(vector<float>& id,vector<int>& num)
 void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& Class_label)
 {
 	fstream write;
-	write.open("Output.txt", ios::out);
-	for (int j = 0; j < col; ++j)
-		{
-			write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
-		}
-		write << fixed << setprecision(2) << setw(7) << "Class_label";
-		write << endl;
+	write.open("Output.csv", ios::out);
 
 	for (int i = 0; i < row; ++i)  
 	{
 		for (int j = 0; j < col; ++j)
 		{
-			write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
+			write << fixed << setprecision(2) << setw(7) << matrix[i][j];
 		}
-		write << fixed << setprecision(2) << setw(7) << "Class-" << Class_label[i];
+		write << fixed << setprecision(2) << setw(7) << Class_label[i];
 		write << endl;
 	}
 	write.close();

@@ -7,17 +7,20 @@
 
 using namespace std;
 
-void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& Class_label);
+void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<float>& id_test, vector<float>& attrib_test, vector<float>& attrib_val_test, vector<int>& Class_label);
 void setSizeMatrix(int row, int col, vector< vector<float> > &matrix);
 void setupMatrix_value(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& num, int row, int col, vector< vector<float> >&matrix);
 void check_attrib_num(vector<float>& id,vector<int>& num);
 void WriteFile( int row, int col, vector< vector<float> > &matrix, vector<int>& Class_label);
+void WriteFile_test( int row, int col, vector< vector<float> > &matrix);
 void FindSameAttrib(vector<float>& attrib, vector<int>& common_attrib, vector<float>& common_value, vector<float>& attrib_val, vector<int>& attrib_num);
+int FindHighestNum(vector<float>& attrib);
+void insertion_sort(vector<float>& input, int length);
 
 int main()
 {
-	int initial_row = 1842;
-	int initial_col = 26428;
+	int initial_row = 0;
+	int initial_col = 0;
 	vector<float> ID;
 	vector<float> Attrib;
 	vector<float> Attrib_val;
@@ -26,21 +29,70 @@ int main()
 	vector<int>class_label;
 	vector<float>Common_value = {0}; // ignore this one
 
+	vector<float> ID_testing;
+	vector<float> Attrib_testing;
+	vector<float> Attrib_val_testing;
+	vector<int>Attrib_num_test; // # of attribute per each ID
+	vector<int>Common_Attrib_test; // contain only common attribute
+
 	vector<vector<float> > Matrix; 
+	vector<vector<float> > Matrix_Test; 
 
-	readFile(ID, Attrib, Attrib_val, class_label); // Read input files
-	check_attrib_num(ID, Attrib_num); // Check how many attributes each ID has
-	FindSameAttrib(Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
-	setSizeMatrix(initial_row, initial_col, Matrix); // setup size of Matrix
+	readFile(ID, Attrib, Attrib_val, ID_testing, Attrib_testing, Attrib_val_testing, class_label); // Read input files
 
-	setupMatrix_value(ID, Attrib, Attrib_val, Attrib_num, initial_row, initial_col, Matrix); // fill the values for the matrix
+	int choice = 0;
 
-	WriteFile(initial_row,initial_col,Matrix, class_label); // export a output file 
+	do
+	{
+		cout << "Which task do you want to perform? " << endl;
+		cout << "1. generate Matrix by Training set" << endl;
+		cout << "2. generate Matrix by Testing set" << endl;
+		cout << "3. Exit" << endl;
+
+		cin >> choice;
+		cout << endl;
+		while(choice < 1 || choice > 3)
+		{
+			cout << "Please Type Valid Operation" << endl;
+			cin >> choice;
+		}
+
+	   switch(choice) 
+	   {
+	      case 1 :
+	      	 	check_attrib_num(ID, Attrib_num); // Check how many attributes each ID has
+				FindSameAttrib(Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
+
+				initial_row = ID_testing.back();
+				initial_col = FindHighestNum(Attrib_testing) + 1;
+
+				setSizeMatrix(initial_row, initial_col, Matrix); // setup size of Matrix
+				setupMatrix_value(ID, Attrib, Attrib_val, Attrib_num, initial_row, initial_col, Matrix); // fill the values for the matrix
+
+				WriteFile(initial_row,initial_col,Matrix, class_label); // export a output file 
+	         break;
+	      case 2 :
+				check_attrib_num(ID_testing, Attrib_num_test); // Check how many attributes each ID has
+				FindSameAttrib(Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
+
+
+				initial_row = ID_testing.back();
+				initial_col = FindHighestNum(Attrib_testing) + 1;
+
+				setSizeMatrix(initial_row, initial_col, Matrix_Test); // setup size of Matrix
+				setupMatrix_value(ID_testing, Attrib_testing, Attrib_val_testing, Attrib_num_test, initial_row, initial_col, Matrix_Test); // fill the values for the matrix
+				WriteFile_test(initial_row,initial_col,Matrix_Test); // export a output file 
+	         break;
+	      case 3 :
+	         break;
+	    }
+
+	}while(choice != 3);
 
 	return 0;
 }
 
-void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& Class_label)
+void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<float>& id_test, vector<float>& attrib_test, vector<float>& attrib_val_test, vector<int>& Class_label)
 {
 	fstream reader;
 	reader.open("training.txt", ios::in);
@@ -69,6 +121,22 @@ void readFile(vector<float>& id, vector<float>& attrib, vector<float>& attrib_va
 	{
 		getline(reader, temp, '\n');
 		Class_label.push_back(stoi(temp));
+	}
+	reader.close();
+
+	reader.open("testing.txt", ios::in);
+	
+	while(reader)
+	{
+		getline(reader, temp, ' '); //get ID for testing
+		id_test.push_back(stof(temp));
+		//cout << temp << " ";
+		getline(reader, temp2, ' '); // get Attribute for testing
+		attrib_test.push_back(stof(temp2));
+		//cout << temp2 << " ";
+		getline(reader, temp3, '\n'); // get Feature value for testing
+		attrib_val_test.push_back(stof(temp3));
+		//cout << temp3 << endl;
 	}
 	reader.close();
 
@@ -151,30 +219,25 @@ void check_attrib_num(vector<float>& id,vector<int>& num)
 void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& Class_label)
 {
 	fstream write;
-	write.open("Output.csv", ios::out);
+	write.open("Output3_training.csv", ios::out);
+	for (int j = 0; j < col; ++j)
+		{
+			write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
+		}
+		write << fixed << setprecision(2) << setw(7) << "Class_label";
+		write << endl;
 
 	for (int i = 0; i < row; ++i)  
 	{
 		for (int j = 0; j < col; ++j)
 		{
-			write << fixed << setprecision(2) << setw(7) << matrix[i][j];
+			write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
 		}
-		write << fixed << setprecision(2) << setw(7) << Class_label[i];
+		write << fixed << setprecision(2) << setw(7) << "Class-" << Class_label[i];
 		write << endl;
 	}
 	write.close();
 
-/*
-	for (int i = 0; i < row; ++i)  
-	{
-		for (int j = 0; j < common_attrib.size(); ++j)
-		{
-			write << fixed << setprecision(2) << setw(7) << matrix[i][j] << ",";
-		}
-		write << endl;
-	}
-	write.close();
-*/
 }
 
 void FindSameAttrib(vector<float>& attrib, vector<int>& common_attrib, vector<float>& common_value, vector<float>& attrib_val, vector<int>& attrib_num)
@@ -201,5 +264,77 @@ void FindSameAttrib(vector<float>& attrib, vector<int>& common_attrib, vector<fl
 			}
 		}
 	}
+
+}
+
+int FindHighestNum(vector<float>& attrib)
+{
+	string helper;
+	int helper2;
+	char helper3;
+	vector<float> temp;
+
+	for (int i = 0; i < attrib.size(); ++i)
+	{
+		helper2 = attrib[i];
+		helper = to_string(helper2);
+		helper3 = helper[2];
+		helper2 = (int)helper3 -48;
+
+		//cout << helper << " " << helper[0] << " " << helper[1] << endl;
+ 
+		if (helper[0] == '2' && helper[1] == '6')
+		{
+			if (helper.size() == 5 && helper2 > 1)
+			{
+				temp.push_back(stof(helper));
+			}
+		}
+	}
+
+	insertion_sort(temp, temp.size());
+	
+	return temp.back();
+}
+
+void insertion_sort (vector<float>& input, int length)
+{
+ 	float j, temp;
+		
+	for (int i = 0; i < length; i++)
+	{
+		j = i;
+		
+		while (j > 0 && input[j] < input[j-1])
+		{
+		  temp = input[j];
+		  input[j] = input[j-1];
+		  input[j-1] = temp;
+		  j--;
+	    }
+	}
+}
+
+void WriteFile_test(int row,  int col, vector< vector<float> > &matrix)
+{
+	fstream write;
+	write.open("Output3_test.csv", ios::out);
+	for (int j = 0; j < col; ++j)
+		{
+			write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
+		}
+		//write << fixed << setprecision(2) << setw(7) << "Class_label";
+		write << endl;
+
+	for (int i = 0; i < row; ++i)  
+	{
+		for (int j = 0; j < col; ++j)
+		{
+			write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
+		}
+		//write << fixed << setprecision(2) << setw(7) << "Class-" << Class_label[i];
+		write << endl;
+	}
+	write.close();
 
 }
