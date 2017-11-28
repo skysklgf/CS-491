@@ -48,10 +48,6 @@ int main()
 	vector<vector<float> > Matrix_Sample; 
 
 	readFile(ID, Attrib, Attrib_val, ID_testing, Attrib_testing, Attrib_val_testing, class_label, ID_Sample, Attrib_Sample, Attrib_val_Sample); // Read input files
-	for (int i = 0; i < class_label_test.size(); ++i)
-	{
-		cout << class_label_test[i] << endl;
-	}
 
 	int choice = 0;
 
@@ -79,6 +75,7 @@ int main()
 
 				initial_row = ID.back();
 				initial_col = FindHighestNum(Attrib) + 1;
+				//cout << initial_row << " " << initial_col << endl;
 
 				setSizeMatrix(initial_row, initial_col, Matrix); // setup size of Matrix
 				setupMatrix_value(ID, Attrib, Attrib_val, Attrib_num, initial_row, initial_col, Matrix); // fill the values for the matrix
@@ -91,10 +88,9 @@ int main()
 				check_attrib_num(ID_testing, Attrib_num_test); // Check how many attributes each ID has
 				//FindSameAttrib(ID_testing, Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
 
-
 				initial_row = ID_testing.back();
 				initial_col = FindHighestNum(Attrib_testing) + 1;
-
+				//cout << initial_row << " " << initial_col << endl;
 				setSizeMatrix(initial_row, initial_col, Matrix_Test); // setup size of Matrix
 				setupMatrix_value(ID_testing, Attrib_testing, Attrib_val_testing, Attrib_num_test, initial_row, initial_col, Matrix_Test); // fill the values for the matrix
 				WriteFile(initial_row,initial_col,Matrix_Test, class_label, 2); // export a output file 
@@ -105,10 +101,9 @@ int main()
   				check_attrib_num(ID_Sample, Attrib_num_Sample); // Check how many attributes each ID has
 				//FindSameAttrib(ID_testing, Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
 
-
 				initial_row = ID_Sample.back();
 				initial_col = FindHighestNum(Attrib_Sample) + 1;
-
+				//cout << initial_row << " " << initial_col << endl;
 				setSizeMatrix(initial_row, initial_col, Matrix_Sample); // setup size of Matrix
 				setupMatrix_value(ID_Sample, Attrib_Sample, Attrib_val_Sample, Attrib_num_Sample, initial_row, initial_col, Matrix_Sample); // fill the values for the matrix
 				WriteFile(initial_row,initial_col,Matrix_Sample, class_label, 3); // export a output file 
@@ -373,6 +368,7 @@ int FindHighestNum(vector<float>& attrib)
 	expected_highest_value = to_string(helper2);
 	char helper3;
 	vector<float> temp;
+	int highest_value = 0;
 
 	for (int i = 0; i < attrib.size(); ++i)
 	{
@@ -391,10 +387,17 @@ int FindHighestNum(vector<float>& attrib)
 			}
 		}
 	}
+	if (temp.size() == 0)
+	{
+		highest_value = attrib.back();
+	}
+	else
+	{
+		insertion_sort(temp, temp.size()); // sort and find biggest value among values which are bigger than the expected value
+		highest_value = temp.back();
+	}	
 
-	insertion_sort(temp, temp.size()); // sort and find biggest value among values which are bigger than the expected value
-	
-	return temp.back();
+	return highest_value;
 }
 
 void insertion_sort (vector<float>& input, int length)
