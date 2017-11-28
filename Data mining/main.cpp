@@ -12,7 +12,7 @@ void setSizeMatrix(int row, int col, vector< vector<float> > &matrix);
 void setupMatrix_value(vector<float>& id, vector<float>& attrib, vector<float>& attrib_val, vector<int>& num, int row, int col, vector< vector<float> >&matrix);
 void check_attrib_num(vector<float>& id,vector<int>& num);
 void WriteFile( int row, int col, vector< vector<float> > &matrix, vector<int>& Class_label, int choice);
-void FindSameAttrib(vector<float>& attrib, vector<int>& common_attrib, vector<float>& common_value, vector<float>& attrib_val, vector<int>& attrib_num);
+void FindSameAttrib(vector<float>& id, vector<float>& attrib, vector<int>& common_attrib, vector<float>& common_value, vector<float>& attrib_val, vector<int>& attrib_num);
 int FindHighestNum(vector<float>& attrib);
 void insertion_sort(vector<float>& input, int length);
 
@@ -75,7 +75,7 @@ int main()
 	   {
 	      case 1 :
 	      	 	check_attrib_num(ID, Attrib_num); // Check how many attributes each ID has
-				//FindSameAttrib(Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
+				//FindSameAttrib(ID, Attrib, Common_Attrib, Common_value, Attrib_val, Attrib_num); // Find common Attribute.
 
 				initial_row = ID.back();
 				initial_col = FindHighestNum(Attrib) + 1;
@@ -89,7 +89,7 @@ int main()
 
 	      case 2 :
 				check_attrib_num(ID_testing, Attrib_num_test); // Check how many attributes each ID has
-				//FindSameAttrib(Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
+				//FindSameAttrib(ID_testing, Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
 
 
 				initial_row = ID_testing.back();
@@ -103,7 +103,7 @@ int main()
 
 	      case 3 :
   				check_attrib_num(ID_Sample, Attrib_num_Sample); // Check how many attributes each ID has
-				//FindSameAttrib(Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
+				//FindSameAttrib(ID_testing, Attrib_testing, Common_Attrib_test, Common_value, Attrib_val_testing, Attrib_num_test); // Find common Attribute.
 
 
 				initial_row = ID_Sample.back();
@@ -271,6 +271,7 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 	{
 		case 1 :
 				write.open("Output_training.csv", ios::out);
+
 			for (int j = 0; j < col; ++j)
 				{
 					write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
@@ -336,7 +337,7 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 
 }
 
-void FindSameAttrib(vector<float>& attrib, vector<int>& common_attrib, vector<float>& common_value, vector<float>& attrib_val, vector<int>& attrib_num)
+void FindSameAttrib(vector<float>& id, vector<float>& attrib, vector<int>& common_attrib, vector<float>& common_value, vector<float>& attrib_val, vector<int>& attrib_num)
 {
 	int count;
 
@@ -350,7 +351,7 @@ void FindSameAttrib(vector<float>& attrib, vector<int>& common_attrib, vector<fl
 				count ++;
 			}
 
-			if (count == 1841) // if the # of attrib is 1841 = common attribute
+			if (count == (id.back()-1) ) // if the # of attrib is 1841 = common attribute
 			{	
 				//cout << attrib[i] << " " << attrib_val[i] << endl;
 				common_attrib.push_back(attrib[i]);
@@ -367,6 +368,9 @@ int FindHighestNum(vector<float>& attrib)
 {
 	string helper;
 	int helper2;
+	string expected_highest_value; // assume last element of the attribute value is the highest number.
+	helper2 = attrib.back();
+	expected_highest_value = to_string(helper2);
 	char helper3;
 	vector<float> temp;
 
@@ -379,16 +383,16 @@ int FindHighestNum(vector<float>& attrib)
 
 		//cout << helper << " " << helper[0] << " " << helper[1] << endl;
  
-		if (helper[0] == '2' && helper[1] == '6')
+		if (helper[0] == expected_highest_value[0] && helper[1] == expected_highest_value[1]) // check first, second digit are same
 		{
-			if (helper.size() == 5 && helper2 > 1)
+			if (helper.size() >= expected_highest_value.size() && helper[2] > expected_highest_value[2]) // check string length is bigger or equal to the expected value with 3rd value.
 			{
-				temp.push_back(stof(helper));
+				temp.push_back(stof(helper)); // if the string length is bigger or equal, and 3rd value is bigger than 3rd value of expected value, put it into array.
 			}
 		}
 	}
 
-	insertion_sort(temp, temp.size());
+	insertion_sort(temp, temp.size()); // sort and find biggest value among values which are bigger than the expected value
 	
 	return temp.back();
 }
