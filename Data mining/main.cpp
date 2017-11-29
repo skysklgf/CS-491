@@ -266,8 +266,9 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 	{
 		case 1 :
 				write.open("Output_training.csv", ios::out);
+				write << fixed << setprecision(2) << setw(5) << "ID" << ",";
 
-			for (int j = 0; j < col; ++j)
+			for (int j = 1; j < col; ++j)
 				{
 					write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
 				}
@@ -288,7 +289,8 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 
 		case 2 :
 			write.open("Output_test.csv", ios::out);
-		for (int j = 0; j < col; ++j)
+			write << fixed << setprecision(2) << setw(5) << "ID" << ",";
+		for (int j = 1; j < col; ++j)
 			{
 				write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
 			}
@@ -309,7 +311,8 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 
 		case 3 :
 			write.open("Output_sample.csv", ios::out);
-		for (int j = 0; j < col; ++j)
+			write << fixed << setprecision(2) << setw(5) << "ID" << ",";
+		for (int j = 1; j < col; ++j)
 			{
 				write << fixed << setprecision(2) << setw(7) << "Attr" << j <<",";
 			}
