@@ -296,9 +296,13 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 			{
 				for (int j = 0; j < col; ++j)
 				{
-					write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
+					if (j != col-1)
+					{
+						write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
+					}
+					else
+						write << fixed << setprecision(2) << setw(7) << matrix[i][j];
 				}
-				//write << fixed << setprecision(2) << setw(7) << "Class-" << Class_label[i];
 				write << endl;
 			}
 			write.close();
@@ -317,9 +321,13 @@ void WriteFile(int row,  int col, vector< vector<float> > &matrix, vector<int>& 
 			{
 				for (int j = 0; j < col; ++j)
 				{
-					write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
+					if (j != col-1)
+					{
+						write << fixed << setprecision(2) << setw(7) << matrix[i][j]<<",";
+					}
+					else
+						write << fixed << setprecision(2) << setw(7) << matrix[i][j];
 				}
-				//write << fixed << setprecision(2) << setw(7) << "Class-" << Class_label[i];
 				write << endl;
 			}
 			write.close();
@@ -344,19 +352,18 @@ void FindSameAttrib(vector<float>& id, vector<float>& attrib, vector<float>& com
 
 	for (int i = 0; i < attrib_num[0]; ++i) // find common attribute
 	{
-		for (int j = 0; j < attrib.size(); ++j)
+		count = 0;
+		for (float j = 0; j < attrib.size(); ++j)
 		{
 			if (attrib[i] == attrib[j])
 			{
 				count ++;
 			}
 
-			if (count == (id.back()-1.0) ) // if the # of attrib is 1841 = common attribute
+			if (count == (id.back()-1) ) // if the # of attrib is 1841 = common attribute
 			{	
 				common_attrib.push_back(attrib[i]);
-				//dataset.push_back(make_pair(temp, temp2));
-
-				count = 0;
+				count = 0.0;
 			}
 		}
 	}
